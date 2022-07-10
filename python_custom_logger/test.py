@@ -27,7 +27,6 @@ def get_day_interval():
             if my_date == "q":
                 logger.info('종료')
                 break
-
             return is_date_correct(my_date)
         except ValueError:
             logger.info("다시 입력 받습니다..")
