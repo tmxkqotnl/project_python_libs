@@ -3,13 +3,6 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 import os
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)  # have to call it at least once to print info/debug level messages
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
-
 class CustomLogger:
     def __init__(self):
         pass
@@ -18,10 +11,14 @@ class CustomLogger:
         self, app_name: str = __name__, log_folder: str = "", log_prefix: str = "log_"
     ):
         log_file_name = "".join([log_prefix, datetime.now().isoformat()[:10], ".log"])
+        
         if log_folder != "" and not os.path.exists(log_folder):
             os.makedirs(log_folder)
+        if log_folder == "" and not os.path.exists('Log'):
+            log_folder = 'Log'
+            os.makedirs(log_folder)
         
-        log_file = os.path.join("Log", log_file_name)
+        log_file = os.path.join(log_folder, log_file_name)
         return self.get_logger(app_name, log_file)
 
     def get_logger(
@@ -37,7 +34,7 @@ class CustomLogger:
         encoding: str = "utf-8",
     ):
         self.logger = logging.getLogger(name=app_name)
-        # self.logger.propagate = False
+        self.logger.propagate = False
         self.logger.setLevel(level=level)
 
         logger_formatter = logging.Formatter(formatter)
@@ -54,12 +51,12 @@ class CustomLogger:
         )
         
         f_handler.setFormatter(logger_formatter)
-        logger.addHandler(f_handler)
+        self.logger.addHandler(f_handler)
 
-        # if NEED_SCREEN_AND_FILE:
-        #     stream_handler = logging.StreamHandler()
-        #     stream_handler.setFormatter(logger_formatter)
-        #     self.logger.addHandler(stream_handler)
+        if NEED_SCREEN_AND_FILE:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(logger_formatter)
+            self.logger.addHandler(stream_handler)
 
         return self.logger
 
